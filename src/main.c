@@ -1,13 +1,15 @@
 #include <stdio.h>
-#include "input_stream.h"
+#include "string_stream.h"
 
 int main(void)
 {
-	InputStream is = input_stream_from_path("test.local.lr");
+	StringStream ss = ss_from_file_path("test.local.lr");
 
-	printf("%s : %zu\n", is.p_buffer, is.size);
+	while (!ss_eof(&ss))
+	{
+		printf("%c : @ (%zu, %zu)\n", ss_next(&ss), ss.row, ss.col);
+	}
 
-	getchar();
-	input_stream_free(&is);
+	ss_free(&ss);
 	return 0;
 }
