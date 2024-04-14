@@ -10,6 +10,9 @@ add_executable(leor
 	src/string_stream.c
 
 	src/helpers/repr.c
+
+	src/lexer/lexer.c
+	src/lexer/token.c
 	
 	src/platform/io.c
 )

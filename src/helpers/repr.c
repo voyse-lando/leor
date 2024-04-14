@@ -5,7 +5,7 @@ case cs: \
 	ret[1] = rt; \
 	break
 
-void repr_char(char *ret, char c)
+void repr_char(char ret[static 3], char c)
 {
 	ret[0] = '\\';
 	ret[1] = '\0';

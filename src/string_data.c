@@ -61,7 +61,7 @@ int string_push(StringData *sd, char c)
 	if (sd->m_p_data_end - sd->p_data >= sd->m_p_data_size)
 		return -1;
 
-	*sd->m_p_data_end = c;
+	*(sd->m_p_data_end) = c;
 	sd->m_p_data_end++;
 
 	return 0;

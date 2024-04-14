@@ -1,17 +1,23 @@
 #include <stdio.h>
+#include "lexer/token.h"
 #include "string_stream.h"
-#include "helpers/repr.h"
+#include "lexer/lexer.h"
 
 int main(void)
 {
 	StringStream ss = ss_from_file_path("test.local.lr");
 
-	char cs[3] = { 0 };
-	while (!ss_eof(&ss))
+	do
 	{
-		repr_char(cs, ss_next(&ss));
-		printf("`%s` : @ (%zu, %zu)\n", cs, ss.row, ss.col);
-	}
+		Token tok = read_token(&ss);
+		printf("`%s` : %s @ (%zu, %zu)\n",
+						tok.value.p_data,
+						token_kind_to_string(tok.kind),
+						tok.row, tok.col
+			  );
+
+		token_free(&tok);
+	} while (!ss_eof(&ss));
 
 	ss_free(&ss);
 	return 0;
