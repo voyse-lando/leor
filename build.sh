@@ -11,9 +11,12 @@ print_help() {
 	echo -e "\t$0 [options]"
 
 	echo "Options:"
-	echo -e "\t-c, --clean\t\t- remove all files from build directory"
-	echo -e "\t-d, --debug\t\t- build debug"
-	echo -e "\t-r, --release\t\t- build release"
+	echo -e "\t-h, --help\t\t- show this dialog"
+	echo -e "\t-c, --clean\t\t- remove all files from the build directory"
+	echo -e "\t-d, --debug\t\t- build debug target"
+	echo -e "\t-r, --release\t\t- build release target"
+	echo -e "\t-x, --execute\t\t- execute target"
+	echo -e "\t-s, --silent\t\t- suppress output of building tools"
 }
 
 if (($# == 0)); then
@@ -40,7 +43,7 @@ for a in $@; do
 				build_target="Debug"
 			;;
 			"r")
-				build_target="Debug"
+				build_target="Release"
 			;;
 			"x")
 				should_run=1
@@ -67,6 +70,9 @@ for a in $@; do
 		;;
 		"--release")
 			build_target="Release"
+		;;
+		"--execute")
+			should_run=1
 		;;
 		"--silent")
 			silent=1
