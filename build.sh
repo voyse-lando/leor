@@ -22,36 +22,70 @@ if (($# == 0)); then
 fi
 
 clean=0
-cmakeflags=""
+build_target=""
+should_run=0
 
 for a in $@; do
 
-	case $a in
-	"-c" | "--clean")
-		echo "INFO: Removing build/"
-		clean=1
-	;;
-	"-d" | "--debug")
-		echo "INFO: Building Debug target"
-		cmakeflags="-DCMAKE_BUILD_TYPE=Debug"
-	;;
-	"-r" | "--release")
-		echo "INFO: Building Release target"
-		cmakeflags="-DCMAKE_BUILD_TYPE=Release"
-	;;
-	*) : ;;
-	esac
+	if [[ -z "${a%\-*}" ]] && [ "${a:0:1}" = "-" ]; then
+		x="${a#\-}"
+		for ((i=0; i<${#x}; i++)); do
+			c="${x:$i:1}"
+			echo $c
+			case "$c" in
+			"c")
+				clean=1
+			;;
+			"d") 
+				build_target="Debug"
+			;;
+			"r")
+				build_target="Debug"
+			;;
+			"x")
+				should_run=1
+			;;
+			*)
+				echo "Error: unknown option '-$c\'"
+				exit
+			esac
+		done
+	else
+		case $a in
+		"--clean")
+			clean=1
+		;;
+		"--debug")
+			build_target="Debug"
+		;;
+		"--release")
+			build_target="Release"
+		;;
+		*) : ;;
+		esac
+	fi
 done
 
 if (($clean == 1)); then
+	echo "INFO: Removing build/"
 	rm -rf build
 fi
 
 mkdir -p build
 
-if [[ -n cmakeflags ]]; then
+if [[ -n "$build_target" ]]; then
+	echo "INFO: Building $build_target target"
 	cd build
-	   cmake -S .. -B . ${cmakeflags} \
+	   cmake -S .. -B . -DCMAKE_BUILD_TYPE=$build_target \
 	&& make
 	cd ..
+fi
+
+if (($should_run == 1)); then
+	if [[ -e build/leor ]]; then
+		echo "INFO: Running target"
+		build/leor
+	else
+		echo "INFO: Target 'build/leor' does not exist; ignoring"
+	fi
 fi
