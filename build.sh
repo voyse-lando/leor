@@ -56,7 +56,7 @@ for a in $@; do
 				exit
 			;;
 			*)
-				echo "Error: unknown option '-$c\'"
+				echo "Error: unknown option '-$c' (use '-h' for help)"
 				exit
 			esac
 		done
@@ -81,13 +81,18 @@ for a in $@; do
 			print_help
 			exit
 		;;
-		*) : ;;
+		*)
+			echo "Error: unknown option '$a' (use '-h' for help)"
+			exit
+		;;
 		esac
 	fi
 done
 
+out_to_null=""
 if (($silent == 1)); then
 	echo() { :; }
+	out_to_null=">/dev/null"
 fi
 
 if (($clean == 1)); then
@@ -96,11 +101,6 @@ if (($clean == 1)); then
 fi
 
 mkdir -p build
-
-out_to_null=""
-if (($silent == 1)); then
-	out_to_null=">/dev/null"
-fi
 
 generate() {
 	   cmake -S .. -B . -DCMAKE_BUILD_TYPE=$build_target \
