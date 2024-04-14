@@ -10,9 +10,13 @@ while (predicate(ss_peek(input))) \
 	(void)string_push(out, ss_next(input))
 
 extern const char *LEXER_KEYWORDS[];
+extern const char LEXER_OPERATORS[];
+extern const char LEXER_PUNCTUATION[];
 
 extern bool isnumber(char c, bool *dot);
 extern bool iskeyword(char *x);
+extern bool isoper(char c);
+extern bool ispunc(char c);
 
 extern Token read_token(StringStream *is);
 

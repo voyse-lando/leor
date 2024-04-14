@@ -8,7 +8,8 @@ typedef enum TokenKind
 {
 	NONE, UNKNOWN, END_OF_FILE,
 	INT, FLOAT,
-	NAME, KEYWORD
+	NAME, KEYWORD,
+	OPERATOR, PUNCTUATION
 }
 TokenKind;
 
