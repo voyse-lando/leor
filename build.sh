@@ -21,6 +21,7 @@ if (($# == 0)); then
 	exit
 fi
 
+silent=0
 clean=0
 build_target=""
 should_run=0
@@ -31,7 +32,6 @@ for a in $@; do
 		x="${a#\-}"
 		for ((i=0; i<${#x}; i++)); do
 			c="${x:$i:1}"
-			echo $c
 			case "$c" in
 			"c")
 				clean=1
@@ -44,6 +44,13 @@ for a in $@; do
 			;;
 			"x")
 				should_run=1
+			;;
+			"s")
+				silent=1
+			;;
+			"h")
+				print_help
+				exit
 			;;
 			*)
 				echo "Error: unknown option '-$c\'"
@@ -61,10 +68,21 @@ for a in $@; do
 		"--release")
 			build_target="Release"
 		;;
+		"--silent")
+			silent=1
+		;;
+		"--help")
+			print_help
+			exit
+		;;
 		*) : ;;
 		esac
 	fi
 done
+
+if (($silent == 1)); then
+	echo() { :; }
+fi
 
 if (($clean == 1)); then
 	echo "INFO: Removing build/"
@@ -73,11 +91,24 @@ fi
 
 mkdir -p build
 
+out_to_null=""
+if (($silent == 1)); then
+	out_to_null=">/dev/null"
+fi
+
+generate() {
+	   cmake -S .. -B . -DCMAKE_BUILD_TYPE=$build_target \
+	&& make 
+}
+
 if [[ -n "$build_target" ]]; then
 	echo "INFO: Building $build_target target"
 	cd build
-	   cmake -S .. -B . -DCMAKE_BUILD_TYPE=$build_target \
-	&& make
+	if (($silent == 1)); then
+		generate >/dev/null
+	else
+		generate
+	fi
 	cd ..
 fi
 
