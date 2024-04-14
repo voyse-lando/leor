@@ -77,8 +77,8 @@ Token read_token(StringStream *is)
 	if (isdigit(x))
 	{
 		bool dot = false;
-		while (isnumber(ss_peek(is), &dot))
-			(void)string_push(&tok.value, ss_next(is));
+
+		READ_WHILE_COND(isnumber(ss_peek(is), &dot), is, &tok.value);
 		(void)string_squeeze(&tok.value);
 		
 		if (dot) tok.kind = FLOAT;
@@ -116,6 +116,50 @@ Token read_token(StringStream *is)
 		tok.kind = PUNCTUATION;
 		return tok;
 	}
+
+#define ESC_SEQ_CASE(ec, sq) \
+case ec: \
+	string_push(&tok.value, sq); \
+	break
+
+	if (x == '\'' || x == '\"')
+	{
+		(void)ss_next(is);
+
+		char z;
+		bool esc = false;
+		while (!ss_eof(is) && (z = ss_next(is)) != x)
+		{
+			if (esc)
+			{
+				esc = false;
+				switch (z) {
+				ESC_SEQ_CASE('0', '\0');
+				ESC_SEQ_CASE('a', '\a');
+				ESC_SEQ_CASE('b', '\b');
+				ESC_SEQ_CASE('f', '\f');
+				ESC_SEQ_CASE('n', '\n');
+				ESC_SEQ_CASE('t', '\t');
+				ESC_SEQ_CASE('v', '\v');
+				default:
+					string_push(&tok.value, z);
+				}
+			}
+			else if (z == '\\')
+				esc = true;
+			else if (z == x)
+				break;
+			else
+				string_push(&tok.value, z);
+		}
+
+		string_squeeze(&tok.value);
+		tok.kind = (x == '\'') ? CHAR : STRING;
+		
+		return tok;
+	}
+
+#undef ESC_SEQ_CASE
 
 	(void)string_push(&tok.value, ss_next(is));
 	(void)string_squeeze(&tok.value);
